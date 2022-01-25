@@ -1,0 +1,283 @@
+import mysql.connector
+import datetime
+print("\n\n\n")
+print("*"*99)
+print("\t\t\t****WELCOME TO PAYROLL MANAGEMENT SYSTEM****")
+print("\t\t\t\tDEVELOPED BY ADHITH ")
+
+db='ADHITH'
+mydb=mysql.connector.connect(host='localhost',user='root',password='root')
+mycursor=mydb.cursor()
+mycursor.execute("Use "+db)
+TableName='ADHITH'
+query="desc table ADHITH"
+while True:
+        print('\n\n\n')
+        print("*"*99)
+        print('\t\t\t\t\tMAIN MENU')
+        print("*"*99)
+        print('\t\t1. Adding Employee records')
+        print('\t\t2. For Displaying Record of All the Employees')
+        print('\t\t3. For Displaying Record of a particular Employee')
+        print('\t\t4. For Deleting Records of all the Employees')
+        print('\t\t5. For Deleting a Record of a particular employee')
+        print('\t\t6. For Modification in a record')
+        print('\t\t7. For displaying payroll ')
+        print('\t\t8. For displaying Salary Slip for all the Employees')
+        print('\t\t9. For displaying Salary Slip for a particular Employee')
+        print('\t\t10.For Exit')
+        print('\t\.')
+        print("*"*99)
+        print('\n\nEnter Choice...',end='')
+        choice=int(input())
+
+        if choice==1:
+                try:
+                    print('Enter employee information.....')
+                    mempno=int(input('Enter Employee No.(int):'))
+                    mname=input('Enter Employee Name (str):')
+                    mDesignation=input('Enter Employee Designation OFFICER,employee,othet temporary( str):')
+                    mbasic=int(input('Enter Basic Salary (int):'))
+                    if mDesignation=='officer':
+                        mda=mbasic*0.5
+                        mhra=mbasic*0.35
+                        mtax=mbasic*0.2
+                        mgross=mbasic+mda+mhra
+                        mnet=mgross-mtax
+                    elif mDesignation=='employee':
+                        mda=mbasic*0.45
+                        mhra=mbasic*0.30
+                        mtax=mbasic*0.15
+                        mgross=mbasic+mda+mhra
+                        mnet=mgross-mtax
+                    else:
+                        mda=mbasic*0.40
+                        mhra=mbasic*0.25
+                        mtax=mbasic*0.1
+                        mgross=mbasic+mda+mhra
+                        mnet=mgross-mtax
+                    rec =(mempno,mname,mDesignation,mbasic,mda,mhra,mgross,mtax,mnet)
+                    query="insert into ADHITH values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                    mycursor.execute(query,rec)
+                    mydb.commit()
+                    print('Record added successfully....')
+                except Exception as e:
+                    print('Something went wrong',e)
+                    print("Record not added in the table...")
+        elif choice==2:
+                try:
+                    query='SELECT * from ADHITH'
+                    mycursor.execute(query)
+                    #print(query)
+                    myrecords=mycursor.fetchall()
+                    for rec in myrecords:
+                       print(rec)
+                except:
+                    print('Something went wrong')        
+
+        elif choice==3:
+                try:
+                        en=input('Enter employee no. of the record to be displayed...')
+                        query="SELECT * FROM ADHITH where empno="+en
+                        mycursor.execute(query)
+                        myrecord=mycursor.fetchone()
+                        print("\n\nRecord of Employee No.:"+en)
+                        print(myrecord)
+                        print(mycursor, headers=['EmpNo','Name','Designation','BasicSalary','DA','HRA','GrossSalary','Tax','Net Salary'], tablefmt='psql')
+                        c=mycursor.rowcount
+                        if c==-1:
+                                print('No Record Found....')
+                except:
+                        print(' ')
+
+
+        elif choice==4:
+                try:
+                    ch=input('Do you want to delete all the records (y/n)')
+                    if ch=='y':
+                        mycursor.execute('DELETE from ADHITH')
+                        mydb.commit()
+                        print('All the records are deleted now...')
+                except:
+                    print('Something went wrong')            
+
+
+        elif choice==5:
+                try:        
+                    en=input('Enter employee no. of the record to be deleted...')
+                    query='delete from ADHITH where empno='+en
+                    mycursor.execute(query)
+                    mydb.commit()
+                    c=mycursor.rowcount
+                    if c>0:
+                        print('Deletion done')
+                    else:
+                        print('Employee no ',en,' not found')
+                except Exception as e:
+                        print('Something went wrong',e)
+
+
+
+        elif choice==6:
+                try:
+                    en=input('Enter employee no. of the record to be modified...')
+                    query='select * from ADHITH where empno='+en
+                    mycursor.execute(query)
+                    myrecord=mycursor.fetchone()
+                    c=mycursor.rowcount
+                    if c==-1:
+                        print('Empno '+en+' does not exist')
+                    else:
+                        mname=myrecord[1]
+                        mDesignation=myrecord[2]
+                        mbasic=myrecord[3]
+                        print('Employee No.  :',myrecord[0])
+                        print('Name          :',myrecord[1])
+                        print('Designation   :',myrecord[2])
+                        print('Basic Salary  :',myrecord[3])
+                        print('DA            :',myrecord[4])
+                        print('HRA           :',myrecord[5])
+                        print('Gross Salary  :',myrecord[6])
+                        print('Tax           :',myrecord[7])
+                        print('Net Salary    :',myrecord[8])
+                        print('----------------------')
+                        print('Type Value to modify below or just press Enter for no change')
+                        x=input('Enter name ')
+                        q=input('Enter Designation ')
+                        w=int(input('Enter basic salary  integer'))
+                        if len(x)>0:
+                                mname=x
+                                mDesignation = q
+                                mbasic=w
+
+                                if mDesignation=='offier':
+                                    mda=mbasic*0.5
+                                    mhra=mbasic*0.35
+                                    mtax=mbasic*0.2
+                                elif mDesignation=='manager':
+                                    mda=mbasic*0.45
+                                    mhra=mbasic*0.30
+                                    mtax=mbasic*0.15
+                                else:
+                                    mda=mbasic*0.40
+                                    mhra=mbasic*0.25
+                                    mtax=mbasic*0.1
+                                    mgross=mbasic+mda+mhra
+                                    mnet=mgross-mtax
+
+                        query="Update %s set Name='%s',Designation='%s',\
+BasicSalary=%s,DA=%s,HRA=%s,GrossSalary=%s,Tax=%s,NetSalary=%s\
+                where EmpNo=%s"%(TableName,mname,mDesignation,mbasic,mda,mhra,mgross,mtax,mnet,en)
+
+                        print(query)
+                        mycursor.execute(query)
+                        mydb.commit()
+                        print('Record modified')
+
+                except Exception as e:
+                    print('Something went wrong',e)
+
+        elif choice==7:
+                try:
+                    query='select * from ADHITH'
+                    mycursor.execute(query)
+                    myrecords=mycursor.fetchall()
+                    print("\n\n\n")
+                    print(95*'*')
+                    print('Employee Payroll'.center(90))
+                    print(95*'*')
+                    now = datetime.datetime.now()
+                    print("Current Date and Time:",end=' ')
+                    print(now.strftime("%Y-%m-%d %H:%M:%S"))
+                    print()
+                    print(95*'-')
+                    print('%-5s %-15s %-10s %-8s  %-8s  %-8s  %-9s  %-8s  %-9s'\
+                          %('Empno','Name','Designation','Basic','DA','HRA','Gross','Tax','Net'))
+                    print(95*'-')
+                    for rec in myrecords:
+                        print('%4d %-15s %-10s %8.2f  %8.2f  %8.2f  %9.2f  %8.2f  %9.2f'%rec)
+                        print(95*'-')
+                except:
+                    print('Something went wrong')        
+
+
+        elif choice==8:
+                try:
+                    query='select * from ADHITH'
+                    mycursor.execute(query)
+                    now = datetime.datetime.now() 
+                    print("\n\n\n")
+                    print("*"*95)
+                    print("\t\t\t\t N.S.Y Pvt.Ltd ")
+                    print("\t\t","-"*45)
+                    print("\t\t\t\tSalary Slip")
+                    print("\t\t\t","-"*30)
+                    print("Current Date and Time:",end=' ')
+                    print(now.strftime("%Y-%m-%d %H:%M:%S"))
+                    data=mycursor.fetchall()
+                    for i in data:
+                        print("Employee id:",i[0])
+                        print("Employee Name:",i[1])
+                        print("Employee Designation:",i[2])
+                        print("Basic salary:",i[3])
+                        print("-"*50)
+                        print("Net Salary:",i[8],"RS")
+                        print("-"*50)
+                        print("."*95)
+                except:
+                    print('Something went wrong')        
+
+        elif choice==9:
+                try:
+                    en=input("Enter employee number whose pay slip you want to retreive:")
+                    query='select * from '+TableName+' where empno='+en
+                    mycursor.execute(query)
+                    myrecord=mycursor.fetchone()
+                    now = datetime.datetime.now() 
+                    c=mycursor.rowcount
+                    if c==-1:
+                        print('Empno '+en+' does not exist')
+                    else:
+                        print("\n\n\n")
+                        print("*"*95)
+                        print("N.S.Y Pvt.Ltd".center(90))
+                        print("\t\t\t","-"*45)
+                        print('SALARY SLIP'.center(90))
+                        print("\t\t\t\t","-"*30)
+                        print("Current Date and Time:",end=' ')
+                        print(now.strftime("%Y-%m-%d %H:%M:%S"))
+                        print("\n\n")
+                        print('Employee No.  :',myrecord[0],'\t\t\tName    :',myrecord[1].upper())
+                        print("-"*95)
+                        print('Designation   :',myrecord[2].upper(),'\t\tMonth   : MARCH,2021')
+                        print("-"*95)
+                        print("Bank Details  : _____________________________________________")
+                        print("Tax Number    : _____________________________________________")
+                        Salary=[['Basic Salary',myrecord[3],'Tax',myrecord[7]],['DA',myrecord[4]],['HRA',myrecord[5]],[],['','','NET SALARY',myrecord[8]]]
+                        print("\n")
+                        print(tabulate(Salary,headers=['Earnings','','Deductions',''],tablefmt='fancy_grid'))
+                #p=inflect.engine()
+                #words=p.number_to_words(myrecord[8])
+                        print('\n',words.upper(),'ONLY')
+                        print("\n")
+                        print("_______________________\t\t\t\t______________________ ")
+                        print("Signature of Employee\t\t\t\t\tDirector")
+
+                        print("-"*90)
+                except Exception as e:
+                   print('Something went wrong',e)            
+
+        elif choice==10:
+                break
+        else:
+            print('Wrong Choice...')
+
+        #CONT=input('do you want to stop (y/n)  :  ')
+        #if CONT=='y':
+                #break
+
+
+
+
+
+ 
